@@ -4,8 +4,9 @@ require "mocks"
 
 module Spec2::Mocks
   class HaveReceived < ::Spec2::Matcher
-    @unwrap :: ::Mocks::HaveReceivedExpectation
+    @unwrap : ::Mocks::HaveReceivedExpectation
     getter unwrap
+    
     def initialize(receive)
       @unwrap = ::Mocks::HaveReceivedExpectation.new(receive)
     end
