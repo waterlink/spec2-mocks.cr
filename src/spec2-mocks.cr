@@ -8,7 +8,7 @@ module ::Spec2::Mocks
     end
 
     def to(m : ::Mocks::Message)
-      allow(@actual).to m
+      ::Mocks::Allow.new(@actual).to m
       delayed_have_received(to, m)
     end
 
@@ -56,18 +56,16 @@ module ::Spec2::Mocks
   end
 end
 
-module ::Spec2::Matchers
-  macro have_received(method)
-    ::Spec2::Mocks::HaveReceived.new(receive({{method}}))
-  end
-end
-
 module ::Spec2::DSL
   macro expect(target)
     ::Spec2::Mocks::Expectation.new({{target}}, __spec2_delayed)
   end
 
-  #include ::Mocks::Macro::GlobalDSL
+  include ::Mocks::Macro::GlobalDSL
+
+  macro have_received(method)
+    ::Spec2::Mocks::HaveReceived.new(receive({{method}}))
+  end
 end
 
 module ::Spec2

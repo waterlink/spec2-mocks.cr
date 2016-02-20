@@ -6,7 +6,7 @@ class Greeting
   end
 end
 
-create_mock Greeting do
+Mocks.create_mock Greeting do
   mock say(what)
 end
 
