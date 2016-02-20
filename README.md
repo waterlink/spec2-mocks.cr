@@ -23,11 +23,23 @@ dependencies:
 require "spec2-mocks"
 ```
 
+This additionally adds `before { Mocks.reset }` to each top-level
+`Spec2.describe`.
+
 ### Using `have_received` matcher
 
 ```crystal
 expect(person).to have_received(say("hello world"))
 ```
+
+### Using `receive` matcher
+
+```crystal
+expect(person).to receive(say("hello world"))
+```
+
+This uses `spec2`'s `delayed { ... }` feature to verify expectations after the
+end of the example.
 
 ## Development
 
