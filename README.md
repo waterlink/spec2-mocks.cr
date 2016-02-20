@@ -14,7 +14,7 @@ Next, add this to your application's `shard.yml`:
 dependencies:
   spec2-mocks:
     github: waterlink/spec2-mocks.cr
-    version: 0.1.0
+    version: 0.1.1
 ```
 
 ## Usage
