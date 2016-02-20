@@ -3,7 +3,9 @@ require "spec2"
 require "mocks"
 
 module Spec2::Mocks
-  class HaveReceived < ::Spec2::Matcher
+  class HaveReceived
+    include ::Spec2::Matcher
+
     @unwrap : ::Mocks::HaveReceivedExpectation
     getter unwrap
     
