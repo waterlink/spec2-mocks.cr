@@ -21,7 +21,7 @@ module ::Spec2::Mocks
     end
 
     macro delayed_have_received(marker, matcher)
-      @delayed << -> do
+      @delayed.not_nil! << -> do
         ::Spec2::Expectation.new(@actual)
           .{{marker.id}} HaveReceived.new({{matcher}})
       end
