@@ -1,15 +1,15 @@
-require "./spec2-mocks/*"
 require "spec2"
 require "mocks"
 
 module ::Spec2::Mocks
   class Expectation(T) < ::Spec2::Expectation(T)
-    def initialize(@actual : T, @delayed)
+    def initialize(@actual : T, @delayed : Array(->)?)
+      @negative = false
     end
 
     def to(m : ::Mocks::Message)
       ::Mocks::Allow.new(@actual).to m
-      delayed_have_received(to, m)
+      delayed_have_received(to, m.receive)
     end
 
     def to(m : ::Mocks::Receive)
@@ -28,26 +28,26 @@ module ::Spec2::Mocks
     end
   end
 
-  class HaveReceived
+  class HaveReceived(T)
     include ::Spec2::Matcher
 
-    @unwrap : ::Mocks::HaveReceivedExpectation
     getter unwrap
+    getter failure_message
+    getter failure_message_when_negated
 
-    def initialize(receive)
-      @unwrap = ::Mocks::HaveReceivedExpectation.new(receive)
+    def initialize(receive : ::Mocks::Receive(T))
+      @unwrap = ::Mocks::HaveReceivedExpectation(T).new(receive)
+      @failure_message = ""
+      @failure_message_when_negated = ""
     end
 
     def match(value)
-      unwrap.match(value)
-    end
+      result = unwrap.match(value)
 
-    def failure_message
-      unwrap.failure_message
-    end
+      @failure_message = unwrap.failure_message(value)
+      @failure_message_when_negated = unwrap.negative_failure_message(value)
 
-    def failure_message_when_negated
-      unwrap.negative_failure_message
+      result
     end
 
     def description
@@ -68,11 +68,24 @@ module ::Spec2::DSL
   end
 end
 
-module ::Spec2
+module ::Spec2::DSL
   macro describe(what, file = __FILE__, line = __LINE__, &blk)
-    ::Spec2::DSL.context({{what}}, {{file}}, {{line}}) do
-      before { Mocks.reset }
+    {% if SPEC2_FULL_CONTEXT == ":root" %}
+      module Spec2___Root
+      @@__spec2_active_context : ::Spec2::Context
+      @@__spec2_active_context = ::Spec2::Context.instance
+      ::Spec2::DSL.context(
+    {% else %}
+      context(
+    {% end %}
+      {{what}}, {{file}}, {{line}}
+    ) do
+      before { ::Mocks.reset }
       {{blk.body}}
     end
+
+    {% if SPEC2_FULL_CONTEXT == ":root" %}
+      {{:end.id}}
+    {% end %}
   end
 end
