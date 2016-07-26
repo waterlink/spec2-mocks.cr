@@ -1,13 +1,11 @@
+--- 
 name: spec2-mocks
-version: 0.3.1
-
-authors:
+version: 0.4.0
+authors: 
   - Oleksii Fedorov <waterlink000@gmail.com>
-
 license: MIT
-
-dependencies:
-  spec2:
+dependencies: 
+  spec2: 
     github: waterlink/spec2.cr
-  mocks:
+  mocks: 
     github: waterlink/mocks.cr
