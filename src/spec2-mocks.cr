@@ -2,9 +2,17 @@ require "spec2"
 require "mocks"
 
 module ::Spec2::Mocks
-  class Expectation(T) < ::Spec2::Expectation(T)
+  class Expectation(T)
     def initialize(@actual : T, @delayed : Array(->)?)
       @negative = false
+    end
+
+    def to(m : ::Spec2::Matcher)
+      ::Spec2::Expectation.new(@actual).to m
+    end
+
+    def not_to(m : ::Spec2::Matcher)
+      ::Spec2::Expectation.new(@actual).not_to m
     end
 
     def to(m : ::Mocks::Message)
@@ -68,24 +76,6 @@ module ::Spec2::DSL
   end
 end
 
-module ::Spec2::DSL
-  macro describe(what, file = __FILE__, line = __LINE__, &blk)
-    {% if SPEC2_FULL_CONTEXT == ":root" %}
-      module Spec2___Root
-      @@__spec2_active_context : ::Spec2::Context
-      @@__spec2_active_context = ::Spec2::Context.instance
-      ::Spec2::DSL.context(
-    {% else %}
-      context(
-    {% end %}
-      {{what}}, {{file}}, {{line}}
-    ) do
-      before { ::Mocks.reset }
-      {{blk.body}}
-    end
-
-    {% if SPEC2_FULL_CONTEXT == ":root" %}
-      {{:end.id}}
-    {% end %}
-  end
+::Spec2::DSL.global_before do
+  ::Mocks.reset
 end

@@ -4,10 +4,15 @@ class Greeting
   def say(what)
     what
   end
+
+  def foo
+    "hello world"
+  end
 end
 
 Mocks.create_mock Greeting do
   mock say(what)
+  mock foo
 end
 
 Spec2.describe "Spec2::Mocks" do
@@ -37,5 +42,23 @@ Spec2.describe "Spec2::Mocks" do
     p = Greeting.new
     expect(p).not_to receive(say("hi John"))
     expect(p.say("hi Bruce")).to eq("hi Bruce")
+  end
+
+  it "works without args" do
+    p = Greeting.new
+    expect(p).to receive(foo).and_return("")
+    expect(p.foo).to eq("")
+  end
+
+  it "doesn't break normal expect(...).[not_]to ..." do
+    expect(true).to eq(true)
+    expect {
+      expect(true).to eq(false)
+    }.to raise_error(::Spec2::ExpectationNotMet)
+
+    expect(false).not_to eq(true)
+    expect {
+      expect(true).not_to eq(true)
+    }.to raise_error(::Spec2::ExpectationNotMet)
   end
 end
